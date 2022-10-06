@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Feather - Control Center </title>
+    <script src="https://kit.fontawesome.com/043e51ac62.js" crossorigin="anonymous"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.1/mdb.min.css" rel="stylesheet" />
+
+</head>
+<body>
+    <div class="d-flex justify-content-center align-items-center vh-100 text-muted">
+        <div class="row">
+            <div class="col">
+                <div class="card text-center shadow p-3" style="width: 18rem;">
+                    <div class="card-body">
+                      <h5 id="temperatureIcon" class="card-title fas fa-thermometer"></h5>
+                      <p id="temperature" style="font-size: 2.5rem;" class="card-text text-muted"></p>
+                    </div>
+                  </div>
+            </div>
+            <div class="col">
+                <div class="card text-center shadow p-3" style="width: 18rem;">
+                    <div class="card-body">
+                      <h5 id="humidityIcon" class="card-title fas fa-thermometer-half"></h5>
+                      <p id="humidity" style="font-size: 2.5rem;" class="card-text text-muted"></p>
+                    </div>
+                  </div>
+            </div>
+        </div>
+		<div class="row">
+            <div class="col">
+                <div class="card text-center shadow p-3" style="width: 18rem;">
+                    <div class="card-body">
+                      <h5 id="temperatureIcon2" class="card-title fas fa-thermometer"></h5>
+                      <p id="temperature2" style="font-size: 2.5rem;" class="card-text text-muted"></p>
+                    </div>
+                  </div>
+            </div>
+            <div class="col">
+                <div class="card text-center shadow p-3" style="width: 18rem;">
+                    <div class="card-body">
+                      <h5 id="humidityIcon2" class="card-title fas fa-thermometer-half"></h5>
+                      <p id="humidity2" style="font-size: 2.5rem;" class="card-text text-muted"></p>
+                    </div>
+                  </div>
+            </div>
+			<button id="getDataBtn">Push to get data</button>
+        </div>
+
+    </div>
+
+    <!-- MDB -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.10.1/mdb.min.js"></script>
+    <script>
+      const baseUrl = "http://192.168.0.45";
+
+      let temperature = document.getElementById('temperature');
+      let temperatureIcon = document.getElementById('temperatureIcon');
+      let humidity = document.getElementById('humidity');
+      let humidityIcon = document.getElementById('humidityIcon');
+      let temperature2 = document.getElementById('temperature2');
+      let humidity2 = document.getElementById('humidity2');
+
+      GetTemperatureAsync();
+      let btn = document.getElementById("getDataBtn");
+      btn.addEventListener("click", function() {
+          fetch("/getdata").then(response => response.json()).then(data => {
+              temperature2.innerHTML = `${data[0].temperature} C`; 
+              humidity2.innerHTML = `${data[0].humidity} %`; 
+          })
+      })
+      function GetTemperatureAsync() {
+          setInterval(() => {
+              fetch(`${baseUrl}/api/temperature`).then(response => response.json()).then(data => {
+                  temperature.innerHTML = `${data.temperature} C`;
+                  humidity.innerHTML = `${data.humidity} %`;
+                  console.log(data);
+                  fetch("/adddata", {
+                      method: "POST",
+                      headers: {'Content-Type' : 'application/json'},
+                      body: JSON.stringify(data)
+                  }).then(res => {
+                      console.log("Response: ", res);
+                  })
+              }).catch(error => console.log(error))
+          },1000)
+      }
+  </script>
+</body>
+</html>
